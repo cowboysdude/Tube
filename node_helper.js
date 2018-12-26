@@ -40,7 +40,7 @@ module.exports = NodeHelper.create({
                             'title': entry.title[0],
                             'id': entry['yt:videoId'][0],
                             'pic': entry['media:group'][0]['media:thumbnail'][0].$.url,
-			    'video':i
+							'video':i
                      	    }); 
                         //console.log(results);  
                         this.sendSocketNotification("TUBE_RESULT", results);
