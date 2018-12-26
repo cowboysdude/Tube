@@ -10,7 +10,7 @@ Module.register("MMM-Tube", {
 
     // Module config defaults.
     defaults: {
-        updateInterval: 120 * 60 * 1000, // every 10 minutes
+        updateInterval: 60 * 1000, // every 10 minutes
         animationSpeed: 10,
         initialLoadDelay: 875, // 0 seconds delay
         retryDelay: 1500,
@@ -18,10 +18,8 @@ Module.register("MMM-Tube", {
         playlist: "",
         useChannel: false,
         maxWidth: "400px",
-        fadeSpeed: 7,
-        rotateInterval: 5 * 1000,
-        readInterval: 240 * 1000
-    }, 
+        fadeSpeed: 7 
+    },
 
     getStyles: function() {
         return ["jquery.fancybox.min.css"];
@@ -46,10 +44,9 @@ Module.register("MMM-Tube", {
         // Set locale. 
         this.today = "";
         this.tube = [];
-        this.activeItem = 0;
-        this.rotateInterval = null;
         this.updateInterval = null;
         this.scheduleUpdate();
+		this.loaded = false;
     },
 
 
@@ -57,7 +54,8 @@ Module.register("MMM-Tube", {
 
         var wrapper = document.createElement("null");
 
-
+        //loading all external js files this way//		
+		
         var scriptElement = document.createElement('script');
         scriptElement.type = 'text/javascript';
         scriptElement.src = "modules/MMM-Tube/jquery-3.3.1.min.js";
@@ -68,72 +66,44 @@ Module.register("MMM-Tube", {
         scriptElement2.src = "modules/MMM-Tube/jquery.fancybox.js";
         document.body.appendChild(scriptElement2);
 
+		//Done loading external js files//
 
         var tube = this.tube;
-        var Keys = Object.keys(this.tube);
-        if (Keys.length > 0) {
-            if (this.activeItem >= Keys.length) {
-                this.activeItem = 0;
-            }
-            var tube = this.tube[Keys[this.activeItem]];
-            console.log(tube);
+		 
+		
+		   var contain = document.createElement("div");
+		  contain.setAttribute("style", "margin-left:auto;","margin-right:auto;");
+		   wrapper.appendChild(contain);
+        
+          tube.forEach(function(video, i) { 
+  
+  
+            var titel = document.createElement(null);
+            titel.addEventListener("click", () => showvid(this));
+            titel.innerHTML =
+                `<div class="item">
+				<div class="tooltip">
+             <a data-fancybox data-width="840" data-height="560" href="https://www.youtube.com/watch?v=${video.id}">
+             <img class="card-img-top" src="https://img.youtube.com/vi/${video.id}/mqdefault.jpg">
+             </a>          
+             <span class="tooltiptext">${video.title}</span>
+             </div> 
+		     </div>`;
+            wrapper.appendChild(titel);
 
-           var titel = document.createElement("div");
-			titel.addEventListener("click", () => showvid(this));
-			titel.innerHTML = `<div class="card">
-        <a data-fancybox data-width="840" data-height="560" href="https://www.youtube.com/watch?v=${tube.id}">
-            <img class="card-img-top" src="https://img.youtube.com/vi/${tube.id}/mqdefault.jpg">
-        </a> 
-            <p class="card-text">
-                ${tube.title}
-            </p> 
-		</div>`;
-			wrapper.appendChild(titel);
-
-            var scriptElement3 = document.createElement('script');
-            scriptElement3.type = 'text/javascript';
-            scriptElement3.src = "modules/MMM-Tube/fire.js";
-            document.body.appendChild(scriptElement3);
-
-  ////////this is where I'm having a hard time figuring it out //////////////////////
-  /* when I start the video it stops the rotateinterval...so I used the 'dblclick' to restart it because if I didn't 
-     then when I click on video to start it stops the rotate then restarts it again at the same time              */
-            function showvid(thisvid) {
-                thisvid.intpause();
-                document.addEventListener("dblclick", () => thisvid.intresume());
-            };
-////////////////////////////////////// Here /////////////////////////////////////////////
-        }
-
+           $('.video-deck .card-body').on('click', function() {
+           $(this).parent().find("a").trigger('click');
+           });
+    });
         return wrapper;
-    },
-
-    intpause: function() {
-        console.log("stopping rotateInterval");
-        clearInterval(this.rotateInterval);
-    },
-
-    intresume: function() {
-        console.log("restarting rotateInterval");
-        this.scheduleCarousel();
-    },
+    }, 
 
     processTube: function(data) {
         this.today = data.Today;
         this.tube = data;
-		
         this.loaded = true;
-		console.log(this.tube);
     },
-
-    scheduleCarousel: function() {
-        this.rotateInterval = setInterval(() => {
-            this.activeItem++;
-            this.updateDom(this.config.animationSpeed);
-        }, this.config.rotateInterval);
-    },
-
-
+   
     scheduleUpdate: function() {
         setInterval(() => {
             this.getTube();
@@ -148,14 +118,7 @@ Module.register("MMM-Tube", {
     socketNotificationReceived: function(notification, payload) {
         if (notification === "TUBE_RESULT") {
             this.processTube(payload);
-
-        }
-        if (this.rotateInterval == null) {
-            this.scheduleCarousel();
-
-            this.updateDom(this.config.animationSpeed);
         }
         this.updateDom(this.config.initialLoadDelay);
     },
-
 });
