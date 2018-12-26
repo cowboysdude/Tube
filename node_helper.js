@@ -1,8 +1,8 @@
 /* Magic Mirror
  * Module: MMM-Tube
  *
- * By Cowboysdude
- * 
+ * By Cowboysdude 
+ *  WITH BIG assist by Sam, Thank you again!!!  
  */
 const NodeHelper = require('node_helper');
 const request = require('request');
@@ -33,38 +33,16 @@ module.exports = NodeHelper.create({
             if (!error && response.statusCode === 200) {
                 parser(body, (err, result) => {
                     if (result.hasOwnProperty('feed')) {
-                        var entries = JSON.parse(JSON.stringify(result.feed.entry));
+                         var entries = result.feed.entry;
                              var results = []; 	
                         for (var i = 0, entry; entry = entries[i]; i++) results.push({
                             'tLink': entry.link[0].$.href,
                             'title': entry.title[0],
                             'id': entry['yt:videoId'][0],
                             'pic': entry['media:group'][0]['media:thumbnail'][0].$.url,
-			    'video':i
-                        });
-//////////////////////the code below this returns an object like this {'video': '0'} through however many videos there are
-// what I would like to do with this object is inject it into each object above.  My return on the above looks like this
-// [ { tLink: 'https://www.youtube.com/watch?v=MpkI7GW2V34',
-//    title: 'The Christmas Shoes',
-//    id: 'MpkI7GW2V34',
-//    pic: 'https://i2.ytimg.com/vi/MpkI7GW2V34/hqdefault.jpg' } ]  
-// there are more then 1 video this is just an example of what it looks like.....what I'd like to do is this:
-//  [ { tLink: 'https://www.youtube.com/watch?v=MpkI7GW2V34',
-//    title: 'The Christmas Shoes',
-//    id: 'MpkI7GW2V34',
-//    pic: 'https://i2.ytimg.com/vi/MpkI7GW2V34/hqdefault.jpg'   
-//    video: '0' }]  <-- with each video being numbered so next video object would be video: "1" etc...
-// This is probably easy but it's just stumping me :)
-///////////////////////////////////////////////////////////////////////////////////////////////////
-			    
-/*	         	    var items = Object.keys(results);
-			  items.forEach(value => { 
-                          const item = {
-			  'video': value
-			  }
-	                }); */
-                        console.log(results);
-					 
+							'video':i
+                     	    }); 
+                        //console.log(results);  
                         this.sendSocketNotification("TUBE_RESULT", results);
                     }
                 });
