@@ -39,7 +39,8 @@ module.exports = NodeHelper.create({
                             'tLink': entry.link[0].$.href,
                             'title': entry.title[0],
                             'id': entry['yt:videoId'][0],
-                            'pic': entry['media:group'][0]['media:thumbnail'][0].$.url
+                            'pic': entry['media:group'][0]['media:thumbnail'][0].$.url,
+			    'video':i
                         });
 //////////////////////the code below this returns an object like this {'video': '0'} through however many videos there are
 // what I would like to do with this object is inject it into each object above.  My return on the above looks like this
@@ -56,12 +57,12 @@ module.exports = NodeHelper.create({
 // This is probably easy but it's just stumping me :)
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 			    
-	         	    var items = Object.keys(results);
+/*	         	    var items = Object.keys(results);
 			  items.forEach(value => { 
                           const item = {
 			  'video': value
 			  }
-	                });
+	                }); */
                         console.log(results);
 					 
                         this.sendSocketNotification("TUBE_RESULT", results);
