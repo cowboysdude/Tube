@@ -21,23 +21,6 @@ module.exports = NodeHelper.create({
             routine;
 	}, timeout);
     }
-
-    getTube: function() {
-        //var playlist = this.config.playlist;
-	/ if we are not loading a list now
-	if(this.paylist_loading==false)
-        {
-	  // and there are more to load
-	  if(this.playlist_index<this.config.playlist.length){
-	    // start a timer to handle more later
-            startTimer(getTube,1000);
-	    // load one now
-	    getUrl('https://www.youtube.com/feeds/videos.xml?playlist_id=' + this.config.playlist[this.playlist_index++]);
-	  }
-	} 
-	else
-	  // loading, wait til it finishes
-	  startTimer(getTube,1000);  		    
     },
 
     getUrl: function(url) {
@@ -57,7 +40,8 @@ module.exports = NodeHelper.create({
                             'title': entry.title[0],
                             'id': entry['yt:videoId'][0],
                             'pic': entry['media:group'][0]['media:thumbnail'][0].$.url,
-      			    'video':i
+      			               'video':i
+ 
                      	    }); 
 			// if we are donw with all the playlist entries
 			if(this.playlist_index==this.config.playlist.length){
