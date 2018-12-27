@@ -18,10 +18,10 @@ module.exports = NodeHelper.create({
         var url = null;
         var playlist = this.config.playlist;
         for (var i = 0; i < playlist.length; i++) {
-            playlist.forEach(function(url) {
+          
 
                 var url = 'https://www.youtube.com/feeds/videos.xml?playlist_id=' + playlist[i];
-            });
+          
         }
     },
 
