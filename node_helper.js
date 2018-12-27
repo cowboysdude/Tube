@@ -13,15 +13,35 @@ module.exports = NodeHelper.create({
     start: function() {
         console.log("Starting module: " + this.name);
     },
-    this.results:[],
+    results:[],
     playlist_index:0,
     playlist_loading:false,
     startTimer: function(routine, timeout){
 	setTimer(()=> { 
             routine;
 	}, timeout);
-    }
+    
     },
+	
+	getTube: function() {
+        //var playlist = this.config.playlist;
+	// if we are not loading a list now
+	if(this.paylist_loading==false)
+        {
+	  // and there are more to load
+	  if(this.playlist_index<this.config.playlist.length){
+	    // start a timer to handle more later
+            startTimer(getTube,1000);
+	    // load one now
+	    getUrl('https://www.youtube.com/feeds/videos.xml?playlist_id=' + this.config.playlist[this.playlist_index++]);
+	  }
+	} 
+	else
+	  // loading, wait til it finishes
+	  startTimer(getTube,1000);  		    
+    },
+	
+	
 
     getUrl: function(url) {
 	// inidcate we are loading, prevent recursion
