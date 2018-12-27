@@ -13,9 +13,9 @@ module.exports = NodeHelper.create({
     start: function() {
         console.log("Starting module: " + this.name);
     },
-    results=[],
-    playlist_index=0;
-    playlist_loading=false,
+    this.results:[],
+    playlist_index:0,
+    playlist_loading:false,
     startTimer: function(routine, timeout){
 	setTimer(()=> { 
             routine;
