@@ -36,14 +36,14 @@ module.exports = NodeHelper.create({
 	  // and there are more to load
 	  if(this.playlist_index<this.config.playlist.length){
 	    // start a timer to handle more later
-            startTimer(getTube,1000);
+            this.startTimer(getTube,1000);
 	    // load one now
 	    getUrl(youtube_playlist_url_root + this.config.playlist[this.playlist_index++]);
 	  }
 	} 
 	else
 	  // loading, wait til it finishes
-	  startTimer(getTube,1000);  		    
+	  this.startTimer(getTube,1000);  		    
     },
 
     // load and process one url of playlist entries
