@@ -14,7 +14,9 @@ module.exports = NodeHelper.create({
         console.log("Starting module: " + this.name);
     },
     results:[],
-    youtube_playlist_url_root:'https://www.youtube.com/feeds/videos.xml?playlist_id=',
+
+    youtube_playlist_url_root;'https://www.youtube.com/feeds/videos.xml?playlist_id=',
+    loadInProgress:false,
     playlist_index:0,
     playlist_loading:false,
     playlist_entries:0,
@@ -29,6 +31,7 @@ module.exports = NodeHelper.create({
 
     // get the list of playlists one at time. no overlap
     getTube: function() {
+	
         //var playlist = this.config.playlist;
 	//if we are not loading a list now
 	if(this.paylist_loading==false)
@@ -40,6 +43,8 @@ module.exports = NodeHelper.create({
 	    // load one now
 	    getUrl(youtube_playlist_url_root + this.config.playlist[this.playlist_index++]);
 	  }
+	  else
+	     this.loadInProgress=false;
 	} 
 	else
 	  // loading, wait til it finishes
@@ -89,13 +94,15 @@ module.exports = NodeHelper.create({
             this.config = payload;
         } else if (notification === 'GET_TUBE') {
 	    // if we are not loading any playlists
-	    if(this.playlist_loading==false){
+	    if(this.loadInProgress==false){
 		// clear the list
 		this.results=[];
 		// reset index for voice
 		this.playlist_entries=0;
 		// start over
 	    	this.playlist_index=0;
+		// indicate loading URL list
+		this.loadInProgress=true;
 		// go load the url list
             	this.getTube();
 	    }
