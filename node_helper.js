@@ -14,36 +14,36 @@ module.exports = NodeHelper.create({
         console.log("Starting module: " + this.name);
     },
     results:[],
-    youtube_playlist_url_root;'https://www.youtube.com/feeds/videos.xml?playlist_id=',
-    playlist_index:0;
+    youtube_playlist_url_root:'https://www.youtube.com/feeds/videos.xml?playlist_id=',
+    playlist_index:0,
     playlist_loading:false,
     playlist_entries:0,
 
     // routine to start timer
     // wait for url load to finish
     startTimer: function(routine, timeout){
-	setTimeOut(()=> { 
+	setTimeout(()=> { 
             routine;
 	}, timeout);
-    }
+    },
 
     // get the list of playlists one at time. no overlap
     getTube: function() {
         //var playlist = this.config.playlist;
-	/ if we are not loading a list now
+	//if we are not loading a list now
 	if(this.paylist_loading==false)
         {
 	  // and there are more to load
 	  if(this.playlist_index<this.config.playlist.length){
 	    // start a timer to handle more later
-            this.startTimer(getTube,1000);
+            this.startTimer(this.getTube,1000);
 	    // load one now
 	    getUrl(youtube_playlist_url_root + this.config.playlist[this.playlist_index++]);
 	  }
 	} 
 	else
 	  // loading, wait til it finishes
-	  this.startTimer(getTube,1000);  		    
+	  this.startTimer(this.getTube,1000);  		    
     },
 
     // load and process one url of playlist entries
@@ -66,8 +66,9 @@ module.exports = NodeHelper.create({
                             'id': entry['yt:videoId'][0],
                             'pic': entry['media:group'][0]['media:thumbnail'][0].$.url,
       			    'video':this.playlist_entries++
-                     	    }
+                     	   
 			}); 
+			 }
 			// if we are donw with all the playlist entries
 			if(this.playlist_index==this.config.playlist.length){
                            //console.log(results); 
