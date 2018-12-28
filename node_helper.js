@@ -22,7 +22,7 @@ module.exports = NodeHelper.create({
     // routine to start timer
     // wait for url load to finish
     startTimer: function(routine, timeout){
-	setTimer(()=> { 
+	setTimeout(()=> { 
             routine;
 	}, timeout);
     },
