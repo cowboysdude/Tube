@@ -15,7 +15,7 @@ module.exports = NodeHelper.create({
     },
     results:[],
 
-    youtube_playlist_url_root;'https://www.youtube.com/feeds/videos.xml?playlist_id=',
+    youtube_playlist_url_root:'https://www.youtube.com/feeds/videos.xml?playlist_id=',
     loadInProgress:false,
     playlist_index:0,
     playlist_loading:false,
