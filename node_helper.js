@@ -43,7 +43,7 @@ module.exports = NodeHelper.create({
 	} 
 	else
 	  // loading, wait til it finishes
-	  startTimer(getTube,1000);  		    
+	  this.startTimer(this.getTube,1000);  		    
     },
 
     // load and process one url of playlist entries
