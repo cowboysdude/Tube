@@ -22,14 +22,19 @@ Module.register('MMM-Tube', {
         rotateInterval: 5 * 1000,
         items: 5		
     },
+self:0,
 
     getStyles: function() {
         return ['jquery.fancybox.min.css'];
     },
 
+    getScripts: function() {
+        return ['jquery-3.3.1.min.js','jquery.fancybox.js'];
+    },
     // Define start sequence.
     start: function() {
         Log.info('Starting module: ' + this.name);
+	self=this;
         this.sendSocketNotification('CONFIG', this.config);
 
         // Set locale. 
@@ -54,24 +59,10 @@ Module.register('MMM-Tube', {
 
         var wrapper = document.createElement('null');
 
-        //loading all external js files this way//		
-		
-        var scriptElement = document.createElement('script');
-        scriptElement.type = 'text/javascript';
-        scriptElement.src = 'modules/MMM-Tube/jquery-3.3.1.min.js';
-        document.body.appendChild(scriptElement);
-
-        var scriptElement2 = document.createElement('script');
-        scriptElement2.type = 'text/javascript';
-        scriptElement2.src = 'modules/MMM-Tube/jquery.fancybox.js';
-        document.body.appendChild(scriptElement2);
-
-        //Done loading external js files//
-
         var tube = this.tube;
         console.log(tube);
         
-		   var keys = Object.keys(this.tube);
+	var keys = Object.keys(this.tube);
  
         if (keys.length > 0) { 
             if (this.activeItem >= keys.length) {
@@ -80,7 +71,7 @@ Module.register('MMM-Tube', {
             var video = this.tube[keys[this.activeItem]];  
 			
             var titel = document.createElement(null);
-            titel.addEventListener('click', () => showvid(this));
+            titel.addEventListener('click', self.showvid(video));
             titel.innerHTML =
                 `<div class="item">
 				<div class="tooltip">
@@ -94,20 +85,22 @@ Module.register('MMM-Tube', {
 		 
            
 		   $('.video-deck .card-body').on('click', function() {
+			Log.log("in click");
                 $(this).parent().find('a').trigger('click');
           
 		     });
 
 		  }
-        //borrowed from MMM-TouchNews modified to fit my needs//
-		   function showvid(thisvid) {
-            clearInterval(thisvid.rotateInterval);
-            $(document).on('afterClose.fb', () => thisvid.scheduleCarousel(this));
-        }
+
          
    
         return wrapper;
     }, 
+        //borrowed from MMM-TouchNews modified to fit my needs//
+	 showvid:  function(thisvid) {
+            clearInterval(thisvid.rotateInterval);
+            $(document).on('afterClose.fb', () => self.scheduleCarousel(thisvid));
+        }, 
 
     processTube: function(data) {
         this.today = data.Today;
