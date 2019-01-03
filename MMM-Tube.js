@@ -6,6 +6,7 @@
  */
 var $, jQuery;
 
+
 Module.register('MMM-Tube', {
 
     // Module config defaults.
@@ -61,7 +62,7 @@ self:0,
 
 	var w= document.createElement('div');
 	  w.setAttribute("class","horizontal-scroll-wrapper squares");
-	wrapper.appendChild(w);
+	  wrapper.appendChild(w);
         var tube = this.tube;
         console.log(tube);
         
@@ -69,32 +70,33 @@ self:0,
 	
  
         if (keys.length > 0) { 
-            if (this.activeItem >= keys.length) {
-                this.activeItem = 0;
+            if (this.activeItem >= keys.length) {  // do we care about the active entry? if you can scroll?
+                this.activeItem = 0;	 	   // are you autoplaying, and centering the 'currently playing'?		
             }
 	    for(var i=0;i<keys.length;i++){
 		var v=document.createElement('div');
-		v.class="tooltip";    
+			v.setAttribute("class","tooltip");    
 
 		var a = document.createElement("a");
-		a.height="320";
-		a.width="640";
-		a.href="https://www.youtube.com/watch?v="+this.tube[keys[i]].id;
+			a.height="320";
+			a.width="640";
+			a.href="https://www.youtube.com/watch?v="+this.tube[keys[i]].id;
+			var video = this.tube[keys[i]]; 
+			a.addEventListener('click', self.showvid(video));
 		
 		var img=document.createElement("img");
-		img.height="320";
-		img.width="640";
-		img.src="https://img.youtube.com/vi/"+this.tube[keys[i]].id+"/mqdefault.jpg";
-		var s = document.createElement("span");
-		s.class="tooltiptext"
-		s.innerHTML=this.tube[keys[i]].title;
-		img.appendChild(s);
-		var video = this.tube[keys[this.activeItem]]; 
-		a.addEventListener('click', self.showvid(video));
+			img.height="320";
+			img.width="640";
+			img.src="https://img.youtube.com/vi/"+this.tube[keys[i]].id+"/mqdefault.jpg";
+			var s = document.createElement("span");
+			s.class="tooltiptext"
+			s.innerHTML=this.tube[keys[i]].title;
+			img.appendChild(s);
+
 		a.appendChild(img);
 		v.appendChild(a);
 		w.appendChild(v);
-	     }
+	    }
 `<div class="horizontal-scroll-wrapper squares">
   <div>item 1</div>
   <div>item 2</div>
@@ -126,8 +128,10 @@ self:0,
 
          
    	console.log(wrapper.innerHTML);
+	
         return wrapper;
     }, 
+
         //borrowed from MMM-TouchNews modified to fit my needs//
 	 showvid:  function(thisvid) {
             clearInterval(thisvid.rotateInterval);
