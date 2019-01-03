@@ -25,7 +25,7 @@ Module.register('MMM-Tube', {
 self:0,
 
     getStyles: function() {
-        return ['jquery.fancybox.min.css'];
+        return ['jquery.fancybox.min.css', 'custom.css'];
     },
 
     getScripts: function() {
@@ -57,31 +57,63 @@ self:0,
 
     getDom: function() {
 
-        var wrapper = document.createElement('null');
+        var wrapper = document.createElement('div');
 
+	var w= document.createElement('div');
+	  w.setAttribute("class","horizontal-scroll-wrapper squares");
+	wrapper.appendChild(w);
         var tube = this.tube;
         console.log(tube);
         
 	var keys = Object.keys(this.tube);
+	
  
         if (keys.length > 0) { 
             if (this.activeItem >= keys.length) {
-                this.activeItem += 0;
+                this.activeItem = 0;
             }
-            var video = this.tube[keys[this.activeItem]];  
-			
-            var titel = document.createElement(null);
-            titel.addEventListener('click', self.showvid(video));
-            titel.innerHTML =
-                `<div class="item">
+	    for(var i=0;i<keys.length;i++){
+		var v=document.createElement('div');
+		v.class="tooltip";    
+
+		var a = document.createElement("a");
+		a.height="320";
+		a.width="640";
+		a.href="https://www.youtube.com/watch?v="+this.tube[keys[i]].id;
+		
+		var img=document.createElement("img");
+		img.height="320";
+		img.width="640";
+		img.src="https://img.youtube.com/vi/"+this.tube[keys[i]].id+"/mqdefault.jpg";
+		var s = document.createElement("span");
+		s.class="tooltiptext"
+		s.innerHTML=this.tube[keys[i]].title;
+		img.appendChild(s);
+		var video = this.tube[keys[this.activeItem]]; 
+		a.addEventListener('click', self.showvid(video));
+		a.appendChild(img);
+		v.appendChild(a);
+		w.appendChild(v);
+	     }
+`<div class="horizontal-scroll-wrapper squares">
+  <div>item 1</div>
+  <div>item 2</div>
+  <div>item 3</div>
+  <div>item 4</div>
+  <div>item 5</div>
+  <div>item 6</div>
+  <div>item 7</div>
+  <div>item 8</div>
+</div>`
+       /*         `<div class="item">
 				<div class="tooltip">
-             <a data-fancybox data-width="840" data-height="560" href="https://www.youtube.com/watch?v=${video.id}">
-             <img class="card-img-top" src="https://img.youtube.com/vi/${video.id}/mqdefault.jpg">
+             <a data-fancybox data-width="640" data-height="320" width="640" height="320" href="https://www.youtube.com/watch?v=${video.id}">
+             <img class="card-img-top" width="640" height="320" src="https://img.youtube.com/vi/${video.id}/mqdefault.jpg">
              </a>          
              <span class="tooltiptext">${video.title}</span>
              </div> 
-		     </div>`;
-            wrapper.appendChild(titel);
+		     </div>`; */
+            //wrapper.appendChild(titel);
 		 
            
 		   $('.video-deck .card-body').on('click', function() {
@@ -93,7 +125,7 @@ self:0,
 		  }
 
          
-   
+   	console.log(wrapper.innerHTML);
         return wrapper;
     }, 
         //borrowed from MMM-TouchNews modified to fit my needs//
@@ -121,6 +153,7 @@ self:0,
 
     socketNotificationReceived: function(notification, payload) {
         if (notification === 'TUBE_RESULT') {
+	    Log.log("videos="+JSON.stringify(payload));
             this.processTube(payload);
         }
 		  if (this.rotateInterval == null) {
