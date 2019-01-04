@@ -5,7 +5,7 @@
  * 
  */
 var $, jQuery;
-
+var PlayerId="Tubeplayer";
 
 Module.register('MMM-Tube', {
 
@@ -21,9 +21,14 @@ Module.register('MMM-Tube', {
         fadeSpeed: 7,
         debug: false,
         rotateInterval: 5 * 1000,
-        items: 5		
+        items: 5,		
     },
 self:0,
+player:null,
+done:false,
+tag:null,
+ready:false,
+wrapper:null,
 
     getStyles: function() {
         return ['jquery.fancybox.min.css', 'custom.css'];
@@ -46,6 +51,8 @@ self:0,
         this.loaded = false;
         this.activeItem = 0;
         this.rotateInterval = null;
+
+	
     },
 
     scheduleCarousel: function() {
@@ -58,13 +65,24 @@ self:0,
 
     getDom: function() {
 
-        var wrapper = document.createElement('div');
+	if(self.tag==null){
+	      self.tag = document.createElement('script');
+
+	      self.tag.src = "https://www.youtube.com/iframe_api";
+	      var firstScriptTag = document.getElementsByTagName('script')[0];
+	      firstScriptTag.parentNode.insertBefore(self.tag, firstScriptTag);
+	}
+        self.wrapper = document.createElement('div');
+
+	var p=document.createElement('div');
+	p.id=PlayerId;
+	self.wrapper.appendChild(p);
 
 	var w= document.createElement('div');
 	  w.setAttribute("class","horizontal-scroll-wrapper squares");
-	  wrapper.appendChild(w);
+	  self.wrapper.appendChild(w);
         var tube = this.tube;
-        console.log(tube);
+        //console.log(tube);
         
 	var keys = Object.keys(this.tube);
 	
@@ -74,20 +92,26 @@ self:0,
                 this.activeItem = 0;	 	   // are you autoplaying, and centering the 'currently playing'?		
             }
 	    for(var i=0;i<keys.length;i++){
+		var video = this.tube[keys[i]];
+
 		var v=document.createElement('div');
 			v.setAttribute("class","tooltip");    
-
+		
 		var a = document.createElement("a");
 			a.height="320";
 			a.width="640";
-			a.href="https://www.youtube.com/watch?v="+this.tube[keys[i]].id;
-			var video = this.tube[keys[i]]; 
-			a.addEventListener('click', self.showvid(video));
+			a.id=video.id.toString();
+
+			a.href="#"; //"https://www.youtube.com/watch?v="+video.id;			 
+			a.onclick=function(){							
+				self.showvid(this.v)
+				}.bind({v:video});
 		
 		var img=document.createElement("img");
 			img.height="320";
 			img.width="640";
-			img.src="https://img.youtube.com/vi/"+this.tube[keys[i]].id+"/mqdefault.jpg";
+			img.src="https://img.youtube.com/vi/"+video.id+"/mqdefault.jpg";
+			//img.onclick= self.showvid(video);
 			var s = document.createElement("span");
 			s.class="tooltiptext"
 			s.innerHTML=this.tube[keys[i]].title;
@@ -96,7 +120,8 @@ self:0,
 		a.appendChild(img);
 		v.appendChild(a);
 		w.appendChild(v);
-	    }
+	    } // for 
+	} // keys 
 `<div class="horizontal-scroll-wrapper squares">
   <div>item 1</div>
   <div>item 2</div>
@@ -118,25 +143,80 @@ self:0,
             //wrapper.appendChild(titel);
 		 
            
-		   $('.video-deck .card-body').on('click', function() {
+		/*   $('.video-deck .card-body').on('click', function() {
 			Log.log("in click");
                 $(this).parent().find('a').trigger('click');
           
-		     });
+		     }); */
 
-		  }
+ 
 
          
-   	console.log(wrapper.innerHTML);
+   	//console.log(self.wrapper.innerHTML);
+	if(self.ready==false)
+	   setTimeout(self.onYouTubeIframeAPIReady,4000);
 	
-        return wrapper;
+        return self.wrapper;
     }, 
 
         //borrowed from MMM-TouchNews modified to fit my needs//
-	 showvid:  function(thisvid) {
+	 showvid1:  function(thisvid) {
             clearInterval(thisvid.rotateInterval);
             $(document).on('afterClose.fb', () => self.scheduleCarousel(thisvid));
         }, 
+	onYouTubeIframeAPIReady: function(){
+	 //Log.error("youtube ready");
+	  self.ready=true;
+	},
+       showvid : function(video) {
+         //Log.error("click 2");
+	if(self.ready){
+		Log.log("video clicked ="+video.title);
+		self.player = new YT.Player(PlayerId, {
+		  height: '390',
+		  width: '640',
+		  videoId: video.id,
+		  events: {
+		    'onReady': self.onPlayerReady,
+		    'onStateChange': self.onPlayerStateChange
+		  }
+		});
+	}
+      },
+
+      // 4. The API will call this function when the video player is ready.
+       onPlayerReady: function(event) {
+	Log.log("playing video now");
+        event.target.playVideo();
+	 //setTimeout(self.stopVideo, 6000);
+      },
+
+      // 5. The API calls this function when the player's state changes.
+      //    The function indicates that when playing a video (state=1),
+      //    the player should play for six seconds and then stop.
+     
+      onPlayerStateChange: function (event) {
+        if (event.data == YT.PlayerState.PLAYING ) {
+	  Log.log("Player playing");
+        }
+else if (event.data == YT.PlayerState.PAUSED ) {	
+	Log.log("Player paused");
+}
+else if (event.data == YT.PlayerState.ENDED ) {	
+	Log.log("Player ended");
+	self.stopVideo();
+}
+      },
+       stopVideo:function() {
+	
+        self.player.stopVideo();
+	self.wrapper.removeChild(document.getElementById(PlayerId));
+	self.player=document.createElement("div");
+	self.player.id=PlayerId;
+	self.wrapper.insertBefore(self.player, self.wrapper.firstChild);
+	
+      },
+
 
     processTube: function(data) {
         this.today = data.Today;
@@ -161,7 +241,7 @@ self:0,
             this.processTube(payload);
         }
 		  if (this.rotateInterval == null) {
-            this.scheduleCarousel();
+            //this.scheduleCarousel();
         }
         this.updateDom(this.config.initialLoadDelay);
     },
